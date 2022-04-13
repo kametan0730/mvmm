@@ -7,18 +7,18 @@
   s3_ ## op1 ## _ ## crn ## _ ## crm ## _ ## op2
 
 #define __read_sysreg(val, reg) \
-  asm volatile("mrs %0, " #reg : "=r"(val))
+  __asm__ volatile("mrs %0, " #reg : "=r"(val))
 #define read_sysreg(val, reg)  __read_sysreg(val, reg)
 
 #define __write_sysreg(reg, val)  \
-  asm volatile("msr " #reg ", %0" : : "r"(val))
+  __asm__ volatile("msr " #reg ", %0" : : "r"(val))
 #define write_sysreg(reg, val)  \
   do { u64 x = (u64)(val); __write_sysreg(reg, x); } while(0)
 
-#define intr_enable()   asm volatile("msr daifclr, #2" ::: "memory")
-#define intr_disable()  asm volatile("msr daifset, #2" ::: "memory")
+#define intr_enable()   __asm__ volatile("msr daifclr, #2" ::: "memory")
+#define intr_disable()  __asm__ volatile("msr daifset, #2" ::: "memory")
 
-#define isb()   asm volatile("isb");
+#define isb()   __asm__ volatile("isb");
 
 #define HCR_VM    (1<<0)
 #define HCR_SWIO  (1<<1)
@@ -30,10 +30,10 @@
 
 #define HPFAR_FIPA_MASK   0xfffffffffff
 
-static inline int cpuid() {
-  int mpidr;
-  read_sysreg(mpidr, mpidr_el1);
-  return mpidr & 0xf;
+static inline int cpuid(){
+    int mpidr;
+    read_sysreg(mpidr, mpidr_el1);
+    return mpidr & 0xf;
 }
 
 #endif

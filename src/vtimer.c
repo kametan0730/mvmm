@@ -2,6 +2,6 @@
 #include "aarch64.h"
 #include "vtimer.h"
 
-void vtimer_init() {
-  ;
+void vtimer_init(){
+    ;
 }

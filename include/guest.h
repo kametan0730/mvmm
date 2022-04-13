@@ -3,9 +3,9 @@
 
 #include "types.h"
 
-struct guest {
-  u64 start;
-  u64 size;
+struct guest{
+    u64 start;
+    u64 size;
 };
 
 #endif

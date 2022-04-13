@@ -97,47 +97,56 @@
 #define GICR_ICFGR1         (SGI_BASE+0xc04)
 #define GICR_IGRPMODR0      (SGI_BASE+0xd00)
 
-static inline u32 gicd_r(u32 offset) {
-  return *(volatile u32 *)(u64)(GICDBASE + offset);
+static inline u32 gicd_r(u32 offset){
+    return *(volatile u32*) (u64) (GICDBASE + offset);
 }
 
-static inline void gicd_w(u32 offset, u32 val) {
-  *(volatile u32 *)(u64)(GICDBASE + offset) = val;
+static inline void gicd_w(u32 offset, u32 val){
+    *(volatile u32*) (u64) (GICDBASE + offset) = val;
 }
 
-static inline u32 gicr_r32(int cpuid, u32 offset) {
-  return *(volatile u32 *)(u64)(GICRBASEn(cpuid) + offset);
+static inline u32 gicr_r32(int cpuid, u32 offset){
+    return *(volatile u32*) (u64) (GICRBASEn(cpuid) + offset);
 }
 
-static inline void gicr_w32(int cpuid, u32 offset, u32 val) {
-  *(volatile u32 *)(u64)(GICRBASEn(cpuid) + offset) = val;
+static inline void gicr_w32(int cpuid, u32 offset, u32 val){
+    *(volatile u32*) (u64) (GICRBASEn(cpuid) + offset) = val;
 }
 
-struct gic_state {
-  u64 lr[16];
-  u64 vmcr;
-  u32 sre_el1;
+struct gic_state{
+    u64 lr[16];
+    u64 vmcr;
+    u32 sre_el1;
 };
 
 void gic_init(void);
+
 void gic_init_cpu(int cpuid);
 
 u32 gic_read_iar(void);
+
 void gic_eoi(u32 iar, int grp);
+
 void gic_deactive_int(u32 irq);
+
 int gic_max_spi(void);
 
 void gic_set_target(u32 irq, u8 target);
 
 u64 gic_read_lr(int n);
+
 void gic_write_lr(int n, u64 val);
+
 u64 gic_make_lr(u32 pirq, u32 virq, int grp);
 
 void gic_irq_enable(u32 irq);
+
 void gic_irq_disable(u32 irq);
+
 void gic_irq_enable_redist(u32 cpuid, u32 irq);
 
-void gic_restore_state(struct gic_state *gic);
-void gic_init_state(struct gic_state *gic);
+void gic_restore_state(struct gic_state* gic);
+
+void gic_init_state(struct gic_state* gic);
 
 #endif

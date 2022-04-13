@@ -25,60 +25,59 @@ typedef unsigned long u64;
 #define MIS   0x40
 #define ICR   0x44
 
-void uart_put64(u64 num, int base) {
-  char buf[sizeof(num) * 8 + 1] = {0};
-  char *end = buf + sizeof(buf);
-  char *cur = end - 1;
+void uart_put64(u64 num, int base){
+    char buf[sizeof(num) * 8 + 1] = {0};
+    char* end = buf + sizeof(buf);
+    char* cur = end - 1;
 
-  do {
-    *--cur = "0123456789abcdef"[num % base];
-  } while(num /= base);
+    do{
+        *--cur = "0123456789abcdef"[num % base];
+    }while(num /= base);
 
-  uart_puts(cur);
+    uart_puts(cur);
 }
 
-void uart_putc(char c) {
-  while(*R(FR) & FR_TXFF)
-    ;
-  *R(DR) = c;
+void uart_putc(char c){
+    while(*R(FR) & FR_TXFF);
+    *R(DR) = c;
 }
 
-void uart_puts(char *s) {
-  char c;
-  while((c = *s++))
-    uart_putc(c);
+void uart_puts(char* s){
+    char c;
+    while((c = *s++))
+        uart_putc(c);
 }
 
-int uart_getc() {
-  if(*R(FR) & FR_RXFE)
-    return -1;
-  else
-    return *R(DR);
+int uart_getc(){
+    if(*R(FR) & FR_RXFE)
+        return -1;
+    else
+        return *R(DR);
 }
 
-void uartintr() {
-  int status = *R(MIS);
+void uartintr(){
+    int status = *R(MIS);
 
-  if(status & INT_RX_ENABLE) {
-    for(;;) {
-      int c = uart_getc();
-      if(c < 0)
-        break;
-      uart_putc(c);
+    if(status & INT_RX_ENABLE){
+        for(;;){
+            int c = uart_getc();
+            if(c < 0)
+                break;
+            uart_putc(c);
+        }
     }
-  }
 
-  if(status & INT_TX_ENABLE) {
-    uart_putc('!');
-  }
+    if(status & INT_TX_ENABLE){
+        uart_putc('!');
+    }
 
-  *R(ICR) = (1<<4);
+    *R(ICR) = (1 << 4);
 }
 
-void uart_init() {
-  *R(CR) = 0;
-  *R(IMSC) = 0;
-  *R(LCRH) = LCRH_FEN | LCRH_WLEN_8BIT;
-  *R(CR) = 0x301;   /* RXE, TXE, UARTEN */
-  *R(IMSC) = (1<<4);
+void uart_init(){
+    *R(CR) = 0;
+    *R(IMSC) = 0;
+    *R(LCRH) = LCRH_FEN | LCRH_WLEN_8BIT;
+    *R(CR) = 0x301;   /* RXE, TXE, UARTEN */
+    //*R(IMSC) = (1<<4);
 }

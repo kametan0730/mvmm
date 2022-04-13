@@ -3,13 +3,13 @@
 
 struct pcpu pcpus[NCPU];
 
-struct pcpu *cur_pcpu() {
-  int id = cpuid();
-  return &pcpus[id];
+struct pcpu* cur_pcpu(){
+    int id = cpuid();
+    return &pcpus[id];
 }
 
-void pcpu_init() {
-  for(int i = 0; i < NCPU; i++) {
-    pcpus[i].cpuid = i;
-  }
+void pcpu_init(){
+    for(int i = 0; i < NCPU; i++){
+        pcpus[i].cpuid = i;
+    }
 }
