@@ -50,6 +50,7 @@ int vmm_init(){
     intr_enable();
 
     for(;;){
-      //  virtio_debug();
+
+      //  __asm__("hlt");
     }
 }

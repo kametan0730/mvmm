@@ -167,6 +167,7 @@ int virtio_net_init(virtio_regs* regs, uint32_t intid){
     //mb();
     //WRITE32(regs->DriverFeatures, 65569);
 
+    print_net_binary(cfg->mac, 6);
 
     WRITE32(regs->Status, READ32(regs->Status) | VIRTIO_STATUS_FEATURES_OK);
     mb();
@@ -199,13 +200,43 @@ int virtio_net_init(virtio_regs* regs, uint32_t intid){
 void virtio_net_send_test(){
     uint8_t buf[1000];
 
+
+    buf[0] = 0xff;
+    buf[1] = 0xff;
+    buf[2] = 0xff;
+    buf[3] = 0xff;
+    buf[4] = 0xff;
+    buf[5] = 0xff;
+
+    /*
+    buf[6] = netdev.regs->Config[0];
+    buf[7] = netdev.regs->Config[1];
+    buf[8] = netdev.regs->Config[2];
+    buf[9] = netdev.regs->Config[3];
+    buf[10] = netdev.regs->Config[4];
+    buf[11] = netdev.regs->Config[5];
+    */
+
+    uint32_t mac_addr_low =  netdev.regs->Config[0];
+    uint32_t mac_addr_high =  netdev.regs->Config[1];
+
+    buf[6] = ((uint8_t * ) & mac_addr_low)[0];
+    buf[7] = ((uint8_t * ) & mac_addr_low)[1];
+    buf[8] = ((uint8_t * ) & mac_addr_low)[2];
+    buf[9] = ((uint8_t * ) & mac_addr_low)[3];
+    buf[10] = ((uint8_t * ) & mac_addr_high)[0];
+    buf[11] = ((uint8_t * ) & mac_addr_high)[1];
+    buf[12] = 0;
+    buf[13] = 0;
+
+    /*
     for(int i = 0; i < 500; ++i){
-        buf[i] = 0x00;
+      buf[i] = 0xff;
     }
 
     for(int i = 0; i < 0xff; ++i){
         buf[i] = 0xff - i;
     }
-
-    virtio_net_send(&netdev, buf, 500);
+    */
+    virtio_net_send(&netdev, buf, 80);
 }
