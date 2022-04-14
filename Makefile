@@ -29,6 +29,10 @@ QEMUOPTS += -nographic -kernel mvmm
 
 TAP_NUM = $(shell date '+%s')
 
+MAC_H = $(shell date '+%H')
+MAC_M = $(shell date '+%M')
+MAC_S = $(shell date '+%S')
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -52,14 +56,18 @@ qemu: mvmm
 dev: mvmm
 	sudo ip link add br4mmvm type bridge || true
 	sudo ip link set br4mmvm up || true
-	sudo $(QEMU) $(QEMUOPTS) -netdev tap,id=net0,ifname=tap$(TAP_NUM),script=no,downscript=no -device virtio-net-device,netdev=net0,mac=01:19:39:59:79:99,bus=virtio-mmio-bus.0
+	sudo ip tuntap add dev tap$(TAP_NUM) mode tap
 	sudo ip link set dev tap$(TAP_NUM) master br4mmvm
+	sudo ip link set tap$(TAP_NUM) up
+	$(QEMU) $(QEMUOPTS) -netdev tap,id=net0,ifname=tap$(TAP_NUM),script=no,downscript=no -device virtio-net-device,netdev=net0,mac=70:32:17:$(MAC_H):$(MAC_M):$(MAC_S),bus=virtio-mmio-bus.0
+	sudo ip link set tap$(TAP_NUM) down
+	sudo ip tuntap del dev tap$(TAP_NUM) mode tap
 
 dev1: mvmm
 	$(QEMU) $(QEMUOPTS) -netdev tap,id=net0,ifname=tap0,script=no,downscript=no -device virtio-net-device,netdev=net0,mac=90:19:39:59:79:99,bus=virtio-mmio-bus.0
 
 dev2: mvmm
-	$(QEMU) $(QEMUOPTS) -netdev tap,id=net1,ifname=tap1,script=no,downscript=no -device virtio-net-device,netdev=net1,mac=90:19:39:85:00:11,bus=virtio-mmio-bus.0
+	$(QEMU) $(QEMUOPTS) -netdev tap,id=net1,ifname=tap1,script=no,downscript=no -device virtio-net-device,netdev=net1,mac=70:32:39:85:00:11,bus=virtio-mmio-bus.0
 
 gdb: mvmm
 	$(QEMU) -S -gdb tcp::1234 $(QEMUOPTS)
